@@ -32,7 +32,7 @@ sf_count_t sfx_mix_mono_read_double (SNDFILE * file, double * data, sf_count_t d
 	sf_count_t dataout = 0;
 	sf_command(file, SFC_GET_CURRENT_SF_INFO, &info, sizeof(info));
 	if (info.channels == 1)
-		return sf_read_double (file, data, datalen);
+		return sf_read_double(file, data, datalen);
 	
 	while(dataout < datalen) {
 		int this_read;
@@ -61,7 +61,7 @@ void fftrec(complex *data, complex *result, unsigned int size, int log2n) {
 		N2=size>>1;
 		for(n=0;n<N2;n++) {
 			ypair[n] = data [n]+ data [n+N2];
-			yimpair[n] = (data [n] - data [n+N2]) * cexp(-2*I*M_PI*n/size);
+			yimpair[n] = (data[n] - data[n+N2]) * cexp(-2*I*M_PI*n/size);
 		}
 		fftrec(ypair, Fpair, N2, log2n);
 		fftrec(yimpair, Fimpair, N2, log2n);
@@ -167,9 +167,9 @@ int main(int argc, char const *argv[]) {
 	SF_INFO sfinfo;
 
 	if((infile = sf_open(argv[2], SFM_READ, &sfinfo))==NULL) {
-	  printf("Fichier introuvable\n");
-	  sf_perror(NULL);
-	  return 1;
+		printf("Fichier introuvable\n");
+		sf_perror(NULL);
+		return 1;
 	}
 	
 	if(argv[1][0] == '0') {
