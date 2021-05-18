@@ -16,10 +16,10 @@
 complex TW[BUFFER_LEN];
 
 int bitrev(int inp, int numbits) {
-	int rev=0;
-	for(int i=0; i<numbits;i++) {
+	int rev=0, i;
+	for(i=0; i<numbits;i++) {
 		rev=(rev << 1) | (inp & 1);
-		inp >>=1;
+		inp>>=1;
 	}
 	return rev;
 }
@@ -28,14 +28,13 @@ sf_count_t sfx_mix_mono_read_double (SNDFILE * file, double * data, sf_count_t d
 	SF_INFO info;
 	static double multi_data[2048];
 	double mix;
-	int k, ch, frames_read;
+	int k, ch, frames_read, this_read;
 	sf_count_t dataout = 0;
 	sf_command(file, SFC_GET_CURRENT_SF_INFO, &info, sizeof(info));
-	if (info.channels == 1)
+	if(info.channels == 1)
 		return sf_read_double(file, data, datalen);
-	
-	while(dataout < datalen) {
-		int this_read;
+
+	while(dataout < datalen) {	
 		this_read = MIN (ARRAY_LEN (multi_data) / info.channels, datalen);
 		frames_read = sf_readf_double (file, multi_data, this_read);
 		if(frames_read == 0)
@@ -60,7 +59,7 @@ void fftrec(complex *data, complex *result, unsigned int size, int log2n) {
 	if(size > 1) {
 		N2=size>>1;
 		for(n=0;n<N2;n++) {
-			ypair[n] = data [n]+ data [n+N2];
+			ypair[n] = data[n]+ data[n+N2];
 			yimpair[n] = (data[n] - data[n+N2]) * cexp(-2*I*M_PI*n/size);
 		}
 		fftrec(ypair, Fpair, N2, log2n);
@@ -82,9 +81,9 @@ void twiddle(complex *TW, unsigned int size) {
 }
 
 void fftiterTW(complex *data, unsigned int size, int log2n) {
-	int i, j, b, n, N2, Bpair, Bimpair, Bp=1, N=size;
+	int k, i, j, b, n, N2, Bpair, Bimpair, Bp=1, N=size;
 	complex impair, pair, ctmp;
-	for(int k=0;k<log2n;k++) {
+	for(k=0;k<log2n;k++) {
 		N2=N>>1;
 		Bpair=0;
 		for(b=0;b<Bp;b++) {
@@ -103,7 +102,7 @@ void fftiterTW(complex *data, unsigned int size, int log2n) {
 	for(i=0;i<size;i++) {
 		j = bitrev(i,log2n);
 		if(j>i) {
-			SWAP(data [j], data [i]);
+			SWAP(data[j], data[i]);
 		}
 	}
 	for(i=size-1;i>0;i--)
@@ -134,13 +133,13 @@ double complexModule(complex c) {
 
 void afficherSpectre(double spectre[], double max) {
 	system("clear");
-	int c = max, l = HAUTEUR;
+	int c = max, l = HAUTEUR, i;
 	while(l>=0) {
 		while(c<l) {
 			printf("\n");
 			l--;
 		}
-		for(int i=0; i<BITRATE/2; i++) {
+		for(i=0 ; i < BITRATE>>1 ; i++) {
 			if(spectre[i]>=c) {
 				printf("*");
 				spectre[i]=c-1;
@@ -167,7 +166,7 @@ int main(int argc, char const *argv[]) {
 	SF_INFO sfinfo;
 
 	if((infile = sf_open(argv[2], SFM_READ, &sfinfo))==NULL) {
-		printf("Fichier introuvable\n");
+		fprintf(stderr,"Fichier introuvable\n");
 		sf_perror(NULL);
 		return 1;
 	}
